@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from typing import List, Optional
-from datetime import datetime, date
+from datetime import datetime, date, timezone
 
 from app.database import get_db
 from app import models
@@ -83,7 +83,7 @@ def update_task(task_id: int, payload: TaskUpdate, db: Session = Depends(get_db)
 
     if payload.completed is not None:
         task.completed = payload.completed
-        task.completed_at = datetime.utcnow() if payload.completed else None
+        task.completed_at = datetime.now(timezone.utc) if payload.completed else None
 
     db.commit()
     db.refresh(task)

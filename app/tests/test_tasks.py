@@ -1,10 +1,4 @@
-from fastapi.testclient import TestClient
-from app.main import app
-
-client = TestClient(app)
-
-def test_create_task():
-    # Create user first
+def test_create_task(client):
     u = client.post("/users", json={
         "username": "taskuser",
         "email": "taskuser@example.com",

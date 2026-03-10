@@ -1,7 +1,6 @@
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, EmailStr, Field, ConfigDict
 from datetime import datetime, date
 from typing import Optional
-
 
 class UserCreate(BaseModel):
     username: str = Field(min_length=3, max_length=30)
@@ -21,8 +20,7 @@ class UserOut(BaseModel):
     email: EmailStr
     created_at: datetime
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 class TaskCreate(BaseModel):
     user_id: int
@@ -46,5 +44,4 @@ class TaskOut(BaseModel):
     completed_at: Optional[datetime]
     created_at: datetime
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
