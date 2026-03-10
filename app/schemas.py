@@ -2,6 +2,7 @@ from pydantic import BaseModel, EmailStr, Field, ConfigDict
 from datetime import datetime, date
 from typing import Optional
 
+# User schemas
 class UserCreate(BaseModel):
     username: str = Field(min_length=3, max_length=30)
     email: EmailStr
@@ -22,6 +23,8 @@ class UserOut(BaseModel):
 
     model_config = ConfigDict(from_attributes=True)
 
+
+# Task schemas 
 class TaskCreate(BaseModel):
     user_id: int
     title: str = Field(min_length=1, max_length=120)
@@ -43,5 +46,37 @@ class TaskOut(BaseModel):
     completed: bool
     completed_at: Optional[datetime]
     created_at: datetime
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+# Habit schemas
+class HabitCreate(BaseModel):
+    user_id: int
+    name: str = Field(min_length=1, max_length=100)
+    frequency: str = Field(default="daily", pattern="^(daily|weekly)$")
+
+class HabitUpdate(BaseModel):
+    name: Optional[str] = Field(default=None, min_length=1, max_length=100)
+    frequency: Optional[str] = Field(default=None, pattern="^(daily|weekly)$")
+
+class HabitOut(BaseModel):
+    id: int
+    user_id: int
+    name: str
+    frequency: str
+    created_at: datetime
+
+    model_config = ConfigDict(from_attributes=True)
+
+class HabitLogCreate(BaseModel):
+    date: date
+    completed: bool = True
+
+class HabitLogOut(BaseModel):
+    id: int
+    habit_id: int
+    date: date
+    completed: bool
 
     model_config = ConfigDict(from_attributes=True)
