@@ -1,24 +1,24 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from typing import List, Optional
-from datetime import datetime, date, timezone
+from datetime import datetime, date
 
 from app.database import get_db
 from app import models
 from app.schemas import TaskCreate, TaskUpdate, TaskOut
+from app.dependencies import get_current_user
 
 router = APIRouter(prefix="/tasks", tags=["Tasks"])
 
 
 @router.post("", response_model=TaskOut, status_code=status.HTTP_201_CREATED)
-def create_task(payload: TaskCreate, db: Session = Depends(get_db)):
-    # Ensure user exists
-    user = db.query(models.User).filter(models.User.id == payload.user_id).first()
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found.")
-
+def create_task(
+    payload: TaskCreate,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
+):
     task = models.Task(
-        user_id=payload.user_id,
+        user_id=current_user.id,
         title=payload.title,
         description=payload.description,
         due_date=payload.due_date,
@@ -34,17 +34,14 @@ def create_task(payload: TaskCreate, db: Session = Depends(get_db)):
 @router.get("", response_model=List[TaskOut])
 def list_tasks(
     db: Session = Depends(get_db),
-    user_id: Optional[int] = None,
+    current_user: models.User = Depends(get_current_user),
     completed: Optional[bool] = None,
     due_from: Optional[date] = None,
     due_to: Optional[date] = None,
     limit: int = 20,
     offset: int = 0,
 ):
-    q = db.query(models.Task)
-
-    if user_id is not None:
-        q = q.filter(models.Task.user_id == user_id)
+    q = db.query(models.Task).filter(models.Task.user_id == current_user.id)
 
     if completed is not None:
         q = q.filter(models.Task.completed == completed)
@@ -59,16 +56,36 @@ def list_tasks(
 
 
 @router.get("/{task_id}", response_model=TaskOut)
-def get_task(task_id: int, db: Session = Depends(get_db)):
-    task = db.query(models.Task).filter(models.Task.id == task_id).first()
+def get_task(
+    task_id: int,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
+):
+    task = (
+        db.query(models.Task)
+        .filter(models.Task.id == task_id, models.Task.user_id == current_user.id)
+        .first()
+    )
+
     if not task:
         raise HTTPException(status_code=404, detail="Task not found.")
+
     return task
 
 
 @router.patch("/{task_id}", response_model=TaskOut)
-def update_task(task_id: int, payload: TaskUpdate, db: Session = Depends(get_db)):
-    task = db.query(models.Task).filter(models.Task.id == task_id).first()
+def update_task(
+    task_id: int,
+    payload: TaskUpdate,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
+):
+    task = (
+        db.query(models.Task)
+        .filter(models.Task.id == task_id, models.Task.user_id == current_user.id)
+        .first()
+    )
+
     if not task:
         raise HTTPException(status_code=404, detail="Task not found.")
 
@@ -83,7 +100,7 @@ def update_task(task_id: int, payload: TaskUpdate, db: Session = Depends(get_db)
 
     if payload.completed is not None:
         task.completed = payload.completed
-        task.completed_at = datetime.now(timezone.utc) if payload.completed else None
+        task.completed_at = datetime.utcnow() if payload.completed else None
 
     db.commit()
     db.refresh(task)
@@ -91,10 +108,20 @@ def update_task(task_id: int, payload: TaskUpdate, db: Session = Depends(get_db)
 
 
 @router.delete("/{task_id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_task(task_id: int, db: Session = Depends(get_db)):
-    task = db.query(models.Task).filter(models.Task.id == task_id).first()
+def delete_task(
+    task_id: int,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
+):
+    task = (
+        db.query(models.Task)
+        .filter(models.Task.id == task_id, models.Task.user_id == current_user.id)
+        .first()
+    )
+
     if not task:
         raise HTTPException(status_code=404, detail="Task not found.")
+
     db.delete(task)
     db.commit()
     return None
