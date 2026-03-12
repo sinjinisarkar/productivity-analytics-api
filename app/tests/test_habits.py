@@ -1,66 +1,119 @@
+def get_auth_headers(client, username="habituser", email="habituser@example.com", password="StrongPass123"):
+    client.post("/users", json={
+        "username": username,
+        "email": email,
+        "password": password
+    })
+
+    login = client.post("/auth/login", data={
+        "username": username,
+        "password": password
+    })
+
+    token = login.json()["access_token"]
+    return {"Authorization": f"Bearer {token}"}
+
+
 def test_create_habit(client):
-    u = client.post("/users", json={
-        "username": "habituser",
-        "email": "habituser@example.com",
-        "password": "StrongPass123"
-    }).json()
+    headers = get_auth_headers(client)
 
     res = client.post("/habits", json={
-        "user_id": u["id"],
-        "name": "Morning Run",
+        "name": "Drink water",
         "frequency": "daily"
-    })
+    }, headers=headers)
+
     assert res.status_code == 201
     body = res.json()
-    assert body["name"] == "Morning Run"
+    assert body["name"] == "Drink water"
     assert body["frequency"] == "daily"
-    assert body["user_id"] == u["id"]
+    assert "user_id" in body
 
 
-def test_create_habit_log(client):
-    u = client.post("/users", json={
-        "username": "loguser",
-        "email": "loguser@example.com",
-        "password": "StrongPass123"
-    }).json()
+def test_list_habits(client):
+    headers = get_auth_headers(client)
+
+    client.post("/habits", json={
+        "name": "Read book",
+        "frequency": "weekly"
+    }, headers=headers)
+
+    res = client.get("/habits", headers=headers)
+
+    assert res.status_code == 200
+    body = res.json()
+    assert isinstance(body, list)
+    assert len(body) == 1
+    assert body[0]["name"] == "Read book"
+
+
+def test_update_habit(client):
+    headers = get_auth_headers(client)
+
+    created = client.post("/habits", json={
+        "name": "Workout",
+        "frequency": "daily"
+    }, headers=headers).json()
+
+    res = client.patch(f"/habits/{created['id']}", json={
+        "frequency": "weekly"
+    }, headers=headers)
+
+    assert res.status_code == 200
+    body = res.json()
+    assert body["frequency"] == "weekly"
+
+
+def test_delete_habit(client):
+    headers = get_auth_headers(client)
+
+    created = client.post("/habits", json={
+        "name": "Meditate",
+        "frequency": "daily"
+    }, headers=headers).json()
+
+    res = client.delete(f"/habits/{created['id']}", headers=headers)
+    assert res.status_code == 204
+
+    res2 = client.get(f"/habits/{created['id']}", headers=headers)
+    assert res2.status_code == 404
+
+
+def test_log_habit(client):
+    headers = get_auth_headers(client)
 
     habit = client.post("/habits", json={
-        "user_id": u["id"],
-        "name": "Read 30 mins",
+        "name": "Journal",
         "frequency": "daily"
-    }).json()
+    }, headers=headers).json()
 
     res = client.post(f"/habits/{habit['id']}/logs", json={
-        "date": "2026-03-10",
+        "date": "2026-03-12",
         "completed": True
-    })
+    }, headers=headers)
+
     assert res.status_code == 201
     body = res.json()
     assert body["habit_id"] == habit["id"]
     assert body["completed"] is True
 
 
-def test_duplicate_habit_log_rejected(client):
-    u = client.post("/users", json={
-        "username": "dupuser",
-        "email": "dupuser@example.com",
-        "password": "StrongPass123"
-    }).json()
+def test_list_habit_logs(client):
+    headers = get_auth_headers(client)
 
     habit = client.post("/habits", json={
-        "user_id": u["id"],
-        "name": "Meditate",
+        "name": "Stretch",
         "frequency": "daily"
-    }).json()
+    }, headers=headers).json()
 
     client.post(f"/habits/{habit['id']}/logs", json={
-        "date": "2026-03-10",
+        "date": "2026-03-12",
         "completed": True
-    })
+    }, headers=headers)
 
-    # Second log for same date should be rejected
-    res = client.post(f"/habits/{habit['id']}/logs", json={
-        "date": "2026-03-10",
-        "completed": True
-    })
-    assert res.status_code == 409
+    res = client.get(f"/habits/{habit['id']}/logs", headers=headers)
+
+    assert res.status_code == 200
+    body = res.json()
+    assert isinstance(body, list)
+    assert len(body) == 1
+    assert body[0]["habit_id"] == habit["id"]

@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from app.routers import users, tasks, habits, auth
+from app.routers import users, tasks, habits, auth, analytics
 
 app = FastAPI(title="Productivity & Habit Analytics API")
 
@@ -11,3 +11,4 @@ app.include_router(users.router)
 app.include_router(tasks.router)
 app.include_router(habits.router)
 app.include_router(auth.router)
+app.include_router(analytics.router)

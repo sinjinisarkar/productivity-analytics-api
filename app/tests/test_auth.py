@@ -1,12 +1,10 @@
 def test_login_success(client):
-    # Create user
     client.post("/users", json={
         "username": "authuser",
         "email": "auth@example.com",
         "password": "StrongPass123"
     })
 
-    # Login
     response = client.post(
         "/auth/login",
         data={
@@ -37,6 +35,7 @@ def test_login_wrong_password(client):
     )
 
     assert response.status_code == 401
+
 
 def test_login_invalid_user(client):
     response = client.post(

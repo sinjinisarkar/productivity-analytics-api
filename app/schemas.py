@@ -51,7 +51,6 @@ class TaskOut(BaseModel):
 
 # Habit schemas
 class HabitCreate(BaseModel):
-    user_id: int
     name: str = Field(min_length=1, max_length=100)
     frequency: str = Field(default="daily", pattern="^(daily|weekly)$")
 

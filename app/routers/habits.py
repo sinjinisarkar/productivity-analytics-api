@@ -6,20 +6,20 @@ from datetime import date
 from app.database import get_db
 from app import models
 from app.schemas import HabitCreate, HabitUpdate, HabitOut, HabitLogCreate, HabitLogOut
+from app.dependencies import get_current_user
 
 router = APIRouter(prefix="/habits", tags=["Habits"])
 
 
 # ── Habit CRUD ─────────────────────────────────────────────
-
 @router.post("", response_model=HabitOut, status_code=status.HTTP_201_CREATED)
-def create_habit(payload: HabitCreate, db: Session = Depends(get_db)):
-    user = db.query(models.User).filter(models.User.id == payload.user_id).first()
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found.")
-
+def create_habit(
+    payload: HabitCreate,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
+):
     habit = models.Habit(
-        user_id=payload.user_id,
+        user_id=current_user.id,
         name=payload.name,
         frequency=payload.frequency,
     )
@@ -32,27 +32,41 @@ def create_habit(payload: HabitCreate, db: Session = Depends(get_db)):
 @router.get("", response_model=List[HabitOut])
 def list_habits(
     db: Session = Depends(get_db),
-    user_id: Optional[int] = None,
+    current_user: models.User = Depends(get_current_user),
     limit: int = Query(default=20, le=100),
     offset: int = 0,
 ):
-    q = db.query(models.Habit)
-    if user_id is not None:
-        q = q.filter(models.Habit.user_id == user_id)
+    q = db.query(models.Habit).filter(models.Habit.user_id == current_user.id)
     return q.order_by(models.Habit.created_at.desc()).limit(limit).offset(offset).all()
 
 
 @router.get("/{habit_id}", response_model=HabitOut)
-def get_habit(habit_id: int, db: Session = Depends(get_db)):
-    habit = db.query(models.Habit).filter(models.Habit.id == habit_id).first()
+def get_habit(
+    habit_id: int,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
+):
+    habit = db.query(models.Habit).filter(
+        models.Habit.id == habit_id,
+        models.Habit.user_id == current_user.id,
+    ).first()
     if not habit:
         raise HTTPException(status_code=404, detail="Habit not found.")
     return habit
 
 
+
 @router.patch("/{habit_id}", response_model=HabitOut)
-def update_habit(habit_id: int, payload: HabitUpdate, db: Session = Depends(get_db)):
-    habit = db.query(models.Habit).filter(models.Habit.id == habit_id).first()
+def update_habit(
+    habit_id: int,
+    payload: HabitUpdate,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
+):
+    habit = db.query(models.Habit).filter(
+        models.Habit.id == habit_id,
+        models.Habit.user_id == current_user.id,
+    ).first()
     if not habit:
         raise HTTPException(status_code=404, detail="Habit not found.")
 
@@ -67,8 +81,15 @@ def update_habit(habit_id: int, payload: HabitUpdate, db: Session = Depends(get_
 
 
 @router.delete("/{habit_id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_habit(habit_id: int, db: Session = Depends(get_db)):
-    habit = db.query(models.Habit).filter(models.Habit.id == habit_id).first()
+def delete_habit(
+    habit_id: int,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
+):
+    habit = db.query(models.Habit).filter(
+        models.Habit.id == habit_id,
+        models.Habit.user_id == current_user.id,
+    ).first()
     if not habit:
         raise HTTPException(status_code=404, detail="Habit not found.")
     db.delete(habit)
@@ -77,10 +98,17 @@ def delete_habit(habit_id: int, db: Session = Depends(get_db)):
 
 
 # ── Habit Log CRUD ─────────────────────────────────────────
-
 @router.post("/{habit_id}/logs", response_model=HabitLogOut, status_code=status.HTTP_201_CREATED)
-def log_habit(habit_id: int, payload: HabitLogCreate, db: Session = Depends(get_db)):
-    habit = db.query(models.Habit).filter(models.Habit.id == habit_id).first()
+def log_habit(
+    habit_id: int,
+    payload: HabitLogCreate,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
+):
+    habit = db.query(models.Habit).filter(
+        models.Habit.id == habit_id,
+        models.Habit.user_id == current_user.id,
+    ).first()
     if not habit:
         raise HTTPException(status_code=404, detail="Habit not found.")
 
@@ -107,12 +135,16 @@ def log_habit(habit_id: int, payload: HabitLogCreate, db: Session = Depends(get_
 def list_habit_logs(
     habit_id: int,
     db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
     from_date: Optional[date] = None,
     to_date: Optional[date] = None,
     limit: int = Query(default=30, le=365),
     offset: int = 0,
 ):
-    habit = db.query(models.Habit).filter(models.Habit.id == habit_id).first()
+    habit = db.query(models.Habit).filter(
+        models.Habit.id == habit_id,
+        models.Habit.user_id == current_user.id,
+    ).first()
     if not habit:
         raise HTTPException(status_code=404, detail="Habit not found.")
 
@@ -126,7 +158,20 @@ def list_habit_logs(
 
 
 @router.delete("/{habit_id}/logs/{log_id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_habit_log(habit_id: int, log_id: int, db: Session = Depends(get_db)):
+def delete_habit_log(
+    habit_id: int,
+    log_id: int,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
+):
+    habit = db.query(models.Habit).filter(
+        models.Habit.id == habit_id,
+        models.Habit.user_id == current_user.id,
+    ).first()
+
+    if not habit:
+        raise HTTPException(status_code=404, detail="Habit not found.")
+
     log = db.query(models.HabitLog).filter(
         models.HabitLog.id == log_id,
         models.HabitLog.habit_id == habit_id,
