@@ -8,6 +8,7 @@ from app.services.summaries import get_user_summary
 from app.services.streaks import get_user_streaks
 from app.services.productivity import get_productivity_score
 from app.services.productivity import get_weekly_progress
+from app.services.productivity import get_heatmap_data
 
 
 
@@ -44,3 +45,11 @@ def analytics_weekly(
     current_user: models.User = Depends(get_current_user),
 ):
     return get_weekly_progress(db, current_user.id)
+
+
+@router.get("/heatmap")
+def analytics_heatmap(
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
+):
+    return get_heatmap_data(db, current_user.id)

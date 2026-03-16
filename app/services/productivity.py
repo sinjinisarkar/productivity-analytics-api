@@ -1,8 +1,10 @@
+import holidays
+
 from sqlalchemy.orm import Session
 from app import models
 from app.services.streaks import get_user_streaks
-from datetime import date, timedelta
-
+from datetime import date, timedelta, datetime
+from collections import defaultdict
 
 
 def get_productivity_score(db: Session, user_id: int):
@@ -87,10 +89,57 @@ def get_weekly_progress(db: Session, user_id: int):
         models.HabitLog.date >= week_start
     ).count()
 
+    # UK public holidays during this week
+    uk_holidays = holidays.UnitedKingdom(years=[week_start.year, week_end.year])
+
+    holidays_in_week = []
+    for holiday_date, holiday_name in uk_holidays.items():
+        if week_start <= holiday_date <= week_end:
+            holidays_in_week.append({
+                "date": holiday_date.isoformat(),
+                "name": holiday_name
+            })
+
     return {
         "week_start": week_start,
         "week_end": week_end,
         "tasks_created": tasks_created,
         "tasks_completed": tasks_completed,
         "habit_logs_completed": habit_logs_completed,
+        "holiday_count": len(holidays_in_week),
+        "holidays": holidays_in_week,
     }
+
+def get_heatmap_data(db: Session, user_id: int):
+    activity = defaultdict(int)
+
+    # Count completed tasks by completion date
+    completed_tasks = db.query(models.Task).filter(
+        models.Task.user_id == user_id,
+        models.Task.completed == True,
+        models.Task.completed_at != None
+    ).all()
+
+    for task in completed_tasks:
+        day = task.completed_at.date().isoformat()
+        activity[day] += 1
+
+    # Count completed habit logs by date
+    completed_logs = db.query(models.HabitLog).join(
+        models.Habit
+    ).filter(
+        models.Habit.user_id == user_id,
+        models.HabitLog.completed == True
+    ).all()
+
+    for log in completed_logs:
+        day = log.date.isoformat()
+        activity[day] += 1
+
+    # Sort by date
+    result = [
+        {"date": day, "activity": count}
+        for day, count in sorted(activity.items())
+    ]
+
+    return result
