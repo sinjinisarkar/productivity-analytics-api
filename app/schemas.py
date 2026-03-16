@@ -78,3 +78,41 @@ class HabitLogOut(BaseModel):
     completed: bool
 
     model_config = ConfigDict(from_attributes=True)
+
+# ── Analytics schemas ──────────────────────────────────────
+
+class SummaryOut(BaseModel):
+    total_tasks: int
+    completed_tasks: int
+    completion_rate: float
+    total_habits: int
+    total_habit_logs: int
+
+class StreakItem(BaseModel):
+    habit_id: int
+    habit_name: str
+    current_streak: int
+    longest_streak: int
+
+class ProductivityOut(BaseModel):
+    productivity_score: float
+    task_score: float
+    habit_score: float
+    streak_bonus: float
+    total_tasks: int
+    completed_tasks: int
+    completed_habit_logs: int
+    best_current_streak: int
+
+class WeeklyOut(BaseModel):
+    week_start: date
+    week_end: date
+    tasks_created: int
+    tasks_completed: int
+    habit_logs_completed: int
+    holiday_count: int
+    holidays: list
+
+class HeatmapItem(BaseModel):
+    date: str
+    activity: int

@@ -59,12 +59,19 @@ def get_productivity_score(db: Session, user_id: int):
         "best_current_streak": longest_current_streak,
     }
 
-def get_weekly_progress(db: Session, user_id: int):
+def get_weekly_progress(db: Session, user_id: int, start_date: date = None, end_date: date = None):
     today = date.today()
 
-    # Monday start of the week
-    week_start = today - timedelta(days=today.weekday())
-    week_end = week_start + timedelta(days=6)
+    # Use provided dates or default to current week
+    if start_date:
+        week_start = start_date
+    else:
+        week_start = today - timedelta(days=today.weekday())
+    
+    if end_date:
+        week_end = end_date
+    else:
+        week_end = week_start + timedelta(days=6)
 
     # Tasks created this week
     tasks_created = db.query(models.Task).filter(
@@ -77,7 +84,8 @@ def get_weekly_progress(db: Session, user_id: int):
         models.Task.user_id == user_id,
         models.Task.completed == True,
         models.Task.completed_at != None,
-        models.Task.completed_at >= week_start
+        models.Task.completed_at >= week_start,
+        models.Task.completed_at <= week_end
     ).count()
 
     # Habit logs completed this week
@@ -86,10 +94,11 @@ def get_weekly_progress(db: Session, user_id: int):
     ).filter(
         models.Habit.user_id == user_id,
         models.HabitLog.completed == True,
-        models.HabitLog.date >= week_start
+        models.HabitLog.date >= week_start,
+        models.HabitLog.date <= week_end
     ).count()
 
-    # UK public holidays during this week
+    # UK public holidays during this period
     uk_holidays = holidays.UnitedKingdom(years=[week_start.year, week_end.year])
 
     holidays_in_week = []
@@ -110,14 +119,16 @@ def get_weekly_progress(db: Session, user_id: int):
         "holidays": holidays_in_week,
     }
 
-def get_heatmap_data(db: Session, user_id: int):
+def get_heatmap_data(db: Session, user_id: int, days: int = 90):
+    cutoff = date.today() - timedelta(days=days)
     activity = defaultdict(int)
 
     # Count completed tasks by completion date
     completed_tasks = db.query(models.Task).filter(
         models.Task.user_id == user_id,
         models.Task.completed == True,
-        models.Task.completed_at != None
+        models.Task.completed_at != None,
+        models.Task.completed_at >= cutoff
     ).all()
 
     for task in completed_tasks:
@@ -129,14 +140,14 @@ def get_heatmap_data(db: Session, user_id: int):
         models.Habit
     ).filter(
         models.Habit.user_id == user_id,
-        models.HabitLog.completed == True
+        models.HabitLog.completed == True,
+        models.HabitLog.date >= cutoff
     ).all()
 
     for log in completed_logs:
         day = log.date.isoformat()
         activity[day] += 1
 
-    # Sort by date
     result = [
         {"date": day, "activity": count}
         for day, count in sorted(activity.items())
