@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Productivity & Habit Analytics</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<nav class="navbar">
+    <h1>📊 Productivity & Habit Analytics</h1>
+    <button id="logout-btn" onclick="logout()">Logout</button>
+</nav>
+
+<!-- Login / Register -->
+<div id="auth-section">
+    <div class="auth-card">
+        <h2 id="auth-title">Welcome Back</h2>
+
+        <div class="form-group" id="email-group" style="display:none;">
+            <label>Email</label>
+            <input type="email" id="email" placeholder="Enter email" />
+        </div>
+        <div class="form-group">
+            <label>Username</label>
+            <input type="text" id="username" placeholder="Enter username" />
+        </div>
+        <div class="form-group">
+            <label>Password</label>
+            <input type="password" id="password" placeholder="Enter password" />
+        </div>
+
+        <button class="btn-primary" id="auth-btn" onclick="handleAuth()">Login</button>
+        <p class="error-msg" id="auth-error"></p>
+        <p class="toggle-link">
+            <span id="toggle-text">Don't have an account?</span>
+            <span onclick="toggleForm()" id="toggle-link-btn">Register here</span>
+        </p>
+    </div>
+</div>
+
+<!-- Dashboard -->
+<div id="dashboard-section">
+    <div class="container">
+
+        <div class="welcome">
+            <h2 id="greeting">Dashboard</h2>
+            <p id="welcome-msg">Loading your productivity data...</p>
+        </div>
+
+        <!-- Summary cards -->
+        <div class="grid">
+            <div class="card">
+                <h3>Productivity Score</h3>
+                <div class="value" id="prod-score">--</div>
+                <div class="label">out of 100</div>
+                <div class="score-bar">
+                    <div class="score-fill" id="score-fill" style="width:0%"></div>
+                </div>
+            </div>
+            <div class="card">
+                <h3>Tasks Completed</h3>
+                <div class="value" id="tasks-completed">--</div>
+                <div class="label" id="tasks-label">of -- tasks</div>
+            </div>
+            <div class="card">
+                <h3>Completion Rate</h3>
+                <div class="value" id="completion-rate">--</div>
+                <div class="label">task completion</div>
+            </div>
+            <div class="card">
+                <h3>Habit Logs</h3>
+                <div class="value" id="habit-logs">--</div>
+                <div class="label" id="habits-label">across -- habits</div>
+            </div>
+        </div>
+
+        <!-- Streaks -->
+        <p class="section-title">🔥 Habit Streaks</p>
+        <div class="streaks-grid" id="streaks-grid">
+            <p class="loading">Loading streaks...</p>
+        </div>
+
+        <!-- Weekly + Heatmap -->
+        <div class="two-col">
+            <div class="card">
+                <h3>This Week</h3>
+                <div class="weekly-stats">
+                    <div class="weekly-stat">
+                        <div class="num" id="week-created">--</div>
+                        <div class="lbl">Tasks Created</div>
+                    </div>
+                    <div class="weekly-stat">
+                        <div class="num" id="week-completed">--</div>
+                        <div class="lbl">Tasks Done</div>
+                    </div>
+                    <div class="weekly-stat">
+                        <div class="num" id="week-habits">--</div>
+                        <div class="lbl">Habit Logs</div>
+                    </div>
+                </div>
+                <div id="holidays-section"></div>
+            </div>
+
+            <div class="card">
+                <h3>Activity Heatmap (Last 90 Days)</h3>
+                <div class="heatmap" id="heatmap"></div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
