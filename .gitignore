@@ -207,3 +207,6 @@ __marimo__/
 
 # app.db
 *.db
+
+# csv files
+*.csv
