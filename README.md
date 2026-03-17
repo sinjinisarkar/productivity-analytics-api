@@ -8,7 +8,7 @@ This project implements a productivity analytics backend that enables users to:
 - Record habit completion logs
 - Analyse productivity behaviour through analytics endpoints
 
-The system is designed with a clean architecture separating routers, services, models, and schemas. It uses JWT authentication to secure user-specific data and ensure proper ownership isolation.
+The system is designed with a clean, modular architecture separating routers, services, models, and schemas. It uses JWT authentication to secure user-specific data and enforce strict ownership-based access control.
 
 ## Features
 ### Core features
@@ -35,6 +35,7 @@ The system is designed with a clean architecture separating routers, services, m
 - JWT Authentication – secure user authentication
 - Pytest – automated testing
 - Python Holidays Library – UK public holiday integration
+- Swagger UI / OpenAPI – interactive API documentation
 
 ## Project Structure
 ```
@@ -68,8 +69,83 @@ productivity-analytics-api/
 │   ├── main.py                 # FastAPI app entry point
 │   ├── models.py               # SQLAlchemy ORM models
 │   └── schemas.py              # Pydantic request/response schemas
+├──frontend/
+│   ├── app.js  
+│   ├── index.html         
+│   └── styles.css         
 ├── .gitignore
 ├── alembic.ini                 # Alembic configuration
 ├── README.md
 └── requirements.txt
 ```
+
+## Installation and Setup
+### 1. Clone the repository
+```bash
+git clone <your-repo-link>
+cd productivity-analytics-api
+```
+
+### 2. Create virtual environment
+```bash
+python -m venv .venv
+source .venv/bin/activate   # Mac/Linux
+.venv\Scripts\activate      # Windows
+```
+
+### 3. Install dependencies
+```bash
+pip install -r requirements.txt
+```
+
+### 4. Run database migrations
+```bash
+alembic upgrade head
+```
+
+### 5. Run the server
+```bash
+uvicorn app.main:app --reload
+```
+
+## Live deployment
+**Backend API:**  
+https://productivity-analytics-api.onrender.com/docs
+
+**Frontend Dashboard:**  
+https://productivity-analytics-api-1.onrender.com/
+
+
+## API documentation
+Swagger UI is available at:
+
+https://productivity-analytics-api.onrender.com/docs
+
+This provides:
+- Interactive endpoint testing
+- Request/response schemas
+- JWT authentication via the Authorize button
+
+## Analytics Overview
+The system goes beyond CRUD by providing:
+- Behavioural insights (streaks)
+- Performance scoring (productivity score)
+- Time-based trends (weekly analytics)
+- Visual activity patterns (heatmap)
+- Context-aware analysis (public holidays)
+
+## Design Decisions
+- FastAPI chosen for high-performance API development and automatic documentation
+- Service layer architecture used to separate business logic from routes
+- JWT authentication ensures secure user-specific data access
+- Modular structure improves scalability and maintainability
+
+## Testing
+Run tests using: 
+```bash
+python -m pytest -q
+```
+Includes:
+- Authentication tests
+- Task and habit endpoint tests
+- Analytics validation
