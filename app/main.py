@@ -2,7 +2,22 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.routers import users, tasks, habits, auth, analytics
 
-app = FastAPI(title="Productivity & Habit Analytics API")
+app = FastAPI(
+    title="Productivity & Habit Analytics API",
+    version="0.1.0",
+    description="""
+A RESTful API for tracking productivity tasks, habits, and personal analytics.
+
+## Features
+- **Users** — Register and manage user accounts
+- **Tasks** — Create and track to-do items with due dates
+- **Habits** — Log daily/weekly habits and track streaks  
+- **Analytics** — Productivity scores, heatmaps, and weekly summaries
+
+## Authentication
+Most endpoints require a Bearer token. Use `POST /auth/login` to obtain one.
+"""
+)
 
 app.add_middleware(
     CORSMiddleware,

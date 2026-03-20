@@ -108,84 +108,86 @@
                 <div class="heatmap" id="heatmap"></div>
             </div>
         </div>
+
+        <div class="centered-section">
+            <!-- Quick Add Section -->
+            <p class="section-title">Quick Add</p>
+            <div class="two-col quick-add-grid">
+                <div class="card">
+                    <h3>Add a Task</h3>
+                    <div class="form-group">
+                        <label>Task Title</label>
+                        <input type="text" id="task-title" placeholder="e.g. Complete assignment" />
+                    </div>
+                    <div class="form-group">
+                        <label>Due Date (optional)</label>
+                        <input type="date" id="task-due-date" />
+                    </div>
+                    <button class="btn-add" onclick="addTask()">Add Task</button>
+                    <p class="success-msg" id="task-success"></p>
+                    <p class="error-msg" id="task-error"></p>
+                </div>
+        
+                <div class="card">
+                    <h3>Add a Habit</h3>
+                    <div class="form-group">
+                        <label>Habit Name</label>
+                        <input type="text" id="habit-name" placeholder="e.g. Morning Run" />
+                    </div>
+                    <div class="form-group">
+                        <label>Frequency</label>
+                        <select id="habit-frequency">
+                            <option value="daily">Daily</option>
+                            <option value="weekly">Weekly</option>
+                        </select>
+                    </div>
+                    <button class="btn-add" onclick="addHabit()">Add Habit</button>
+                    <p class="success-msg" id="habit-success"></p>
+                    <p class="error-msg" id="habit-error"></p>
+                </div>
+            </div>
+        
+            <!-- Log a Habit -->
+            <div class="card log-card">
+                <h3>Log a Habit Completion</h3>
+                <div class="log-grid">
+                    <div class="form-group">
+                        <label>Select Habit</label>
+                        <select id="log-habit-select">
+                            <option value="">-- Select a habit --</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Date</label>
+                        <input type="date" id="log-date" />
+                    </div>
+                    <div class="form-group">
+                        <label>Completed?</label>
+                        <select id="log-completed">
+                            <option value="true">Yes</option>
+                            <option value="false">No</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>&nbsp;</label>
+                        <button class="btn-add btn-log" onclick="logHabit()">Log</button>
+                    </div>
+                </div>
+                <p class="success-msg" id="log-success"></p>
+                <p class="error-msg" id="log-error"></p>
+            </div>
+        
+            <!-- My Tasks -->
+            <div style="margin-top: 2rem;"></div>
+            <p class="section-title">My Tasks</p>
+            <div class="card tasks-card">
+                <div id="tasks-list"><p class="loading">Loading tasks...</p></div>
+            </div>
+        </div>
     </div>
 </div>
 
-<div class="centered-section">
-    <!-- Quick Add Section -->
-    <p class="section-title">Quick Add</p>
-    <div class="two-col quick-add-grid">
-        <div class="card">
-            <h3>Add a Task</h3>
-            <div class="form-group">
-                <label>Task Title</label>
-                <input type="text" id="task-title" placeholder="e.g. Complete assignment" />
-            </div>
-            <div class="form-group">
-                <label>Due Date (optional)</label>
-                <input type="date" id="task-due-date" />
-            </div>
-            <button class="btn-add" onclick="addTask()">Add Task</button>
-            <p class="success-msg" id="task-success"></p>
-            <p class="error-msg" id="task-error"></p>
-        </div>
 
-        <div class="card">
-            <h3>Add a Habit</h3>
-            <div class="form-group">
-                <label>Habit Name</label>
-                <input type="text" id="habit-name" placeholder="e.g. Morning Run" />
-            </div>
-            <div class="form-group">
-                <label>Frequency</label>
-                <select id="habit-frequency">
-                    <option value="daily">Daily</option>
-                    <option value="weekly">Weekly</option>
-                </select>
-            </div>
-            <button class="btn-add" onclick="addHabit()">Add Habit</button>
-            <p class="success-msg" id="habit-success"></p>
-            <p class="error-msg" id="habit-error"></p>
-        </div>
-    </div>
-
-    <!-- Log a Habit -->
-    <div class="card log-card">
-        <h3>Log a Habit Completion</h3>
-        <div class="log-grid">
-            <div class="form-group">
-                <label>Select Habit</label>
-                <select id="log-habit-select">
-                    <option value="">-- Select a habit --</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label>Date</label>
-                <input type="date" id="log-date" />
-            </div>
-            <div class="form-group">
-                <label>Completed?</label>
-                <select id="log-completed">
-                    <option value="true">Yes</option>
-                    <option value="false">No</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label>&nbsp;</label>
-                <button class="btn-add btn-log" onclick="logHabit()">Log</button>
-            </div>
-        </div>
-        <p class="success-msg" id="log-success"></p>
-        <p class="error-msg" id="log-error"></p>
-    </div>
-
-    <!-- My Tasks -->
-    <div style="margin-top: 2rem;"></div>
-    <p class="section-title">My Tasks</p>
-    <div class="card tasks-card">
-        <div id="tasks-list"><p class="loading">Loading tasks...</p></div>
-    </div>
-</div>
 
 <script src="app.js"></script>
 </body>
