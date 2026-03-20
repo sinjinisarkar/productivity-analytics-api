@@ -6,7 +6,7 @@ app = FastAPI(title="Productivity & Habit Analytics API")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["https://productivity-analytics-api-1.onrender.com"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

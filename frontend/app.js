@@ -1,4 +1,4 @@
-const API = 'http://127.0.0.1:8000';
+const API = 'https://productivity-analytics-api.onrender.com';
 let token = localStorage.getItem('token') || null;
 let isLoginMode = true;
 
@@ -237,7 +237,7 @@ async function addTask() {
             return;
         }
 
-        document.getElementById('task-success').textContent = '✅ Task added!';
+        document.getElementById('task-success').textContent = 'Task added!';
         document.getElementById('task-title').value = '';
         document.getElementById('task-due-date').value = '';
         setTimeout(() => document.getElementById('task-success').textContent = '', 3000);
@@ -332,7 +332,7 @@ async function logHabit() {
             return;
         }
 
-        document.getElementById('log-success').textContent = '✅ Habit logged!';
+        document.getElementById('log-success').textContent = 'Habit logged!';
         setTimeout(() => document.getElementById('log-success').textContent = '', 3000);
         loadStreaks();
         loadHeatmap();
