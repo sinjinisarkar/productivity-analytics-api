@@ -116,10 +116,10 @@ https://productivity-analytics-api.onrender.com/docs
 https://productivity-analytics-api-1.onrender.com/
 
 
-## API documentation
-Swagger UI is available at:
+## API Documentation
+The full API documentation is available as a PDF: [API Documentation](./docs/api-documentation.pdf)
 
-https://productivity-analytics-api.onrender.com/docs
+Or view it live at: https://productivity-analytics-api.onrender.com/redoc
 
 This provides:
 - Interactive endpoint testing

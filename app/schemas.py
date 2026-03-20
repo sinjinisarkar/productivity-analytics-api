@@ -1,18 +1,18 @@
 from pydantic import BaseModel, EmailStr, Field, ConfigDict
-from datetime import datetime, date
+from datetime import datetime, date as date_type
 from typing import Optional
 
 # User schemas
 class UserCreate(BaseModel):
-    username: str = Field(min_length=3, max_length=30)
-    email: EmailStr
-    password: str = Field(min_length=8, max_length=72)
+    username: str = Field(min_length=3, max_length=30, examples=["student_1001"])
+    email: EmailStr = Field(examples=["student1001@example.com"])
+    password: str = Field(min_length=8, max_length=72, examples=["Password123"])
 
 
 class UserUpdate(BaseModel):
-    username: Optional[str] = Field(default=None, min_length=3, max_length=30)
-    email: Optional[EmailStr] = None
-    password: Optional[str] = Field(default=None, min_length=8, max_length=72)
+    username: Optional[str] = Field(default=None, min_length=3, max_length=30, examples=["student_1001"])
+    email: Optional[EmailStr] = Field(default=None, examples=["student1001@example.com"])
+    password: Optional[str] = Field(default=None, min_length=8, max_length=72, examples=["NewPassword123"])
 
 
 class UserOut(BaseModel):
@@ -26,22 +26,22 @@ class UserOut(BaseModel):
 
 # Task schemas
 class TaskCreate(BaseModel):
-    title: str = Field(min_length=1, max_length=120)
-    description: Optional[str] = Field(default=None, max_length=500)
-    due_date: Optional[date] = None
+    title: str = Field(min_length=1, max_length=120, examples=["Complete Computer Science assignment"])
+    description: Optional[str] = Field(default=None, max_length=500, examples=["Generated from student dataset - Motivation: 8/10"])
+    due_date: Optional[date_type] = Field(default=None, examples=["2026-03-27"])
 
 class TaskUpdate(BaseModel):
-    title: Optional[str] = Field(default=None, min_length=1, max_length=120)
-    description: Optional[str] = Field(default=None, max_length=500)
-    due_date: Optional[date] = None
-    completed: Optional[bool] = None  # if set True, we auto-set completed_at
+    title: Optional[str] = Field(default=None, min_length=1, max_length=120, examples=["Review lecture notes"])
+    description: Optional[str] = Field(default=None, max_length=500, examples=["Focus on chapters 4 and 5"])
+    due_date: Optional[date_type] = Field(default=None, examples=["2026-03-27"])
+    completed: Optional[bool] = Field(default=None, examples=[True])
 
 class TaskOut(BaseModel):
     id: int
     user_id: int
     title: str
     description: Optional[str]
-    due_date: Optional[date]
+    due_date: Optional[date_type]
     completed: bool
     completed_at: Optional[datetime]
     created_at: datetime
@@ -51,12 +51,12 @@ class TaskOut(BaseModel):
 
 # Habit schemas
 class HabitCreate(BaseModel):
-    name: str = Field(min_length=1, max_length=100)
-    frequency: str = Field(default="daily", pattern="^(daily|weekly)$")
+    name: str = Field(min_length=1, max_length=100, examples=["Daily Study"])
+    frequency: str = Field(default="daily", pattern="^(daily|weekly)$", examples=["daily"])
 
 class HabitUpdate(BaseModel):
-    name: Optional[str] = Field(default=None, min_length=1, max_length=100)
-    frequency: Optional[str] = Field(default=None, pattern="^(daily|weekly)$")
+    name: Optional[str] = Field(default=None, min_length=1, max_length=100, examples=["Sleep 8 Hours"])
+    frequency: Optional[str] = Field(default=None, pattern="^(daily|weekly)$", examples=["daily"])
 
 class HabitOut(BaseModel):
     id: int
@@ -68,13 +68,13 @@ class HabitOut(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 class HabitLogCreate(BaseModel):
-    date: date
-    completed: bool = True
+    date: date_type = Field(examples=["2026-03-20"])
+    completed: bool = Field(default=True, examples=[True])
 
 class HabitLogOut(BaseModel):
     id: int
     habit_id: int
-    date: date
+    date: date_type
     completed: bool
 
     model_config = ConfigDict(from_attributes=True)
@@ -105,8 +105,8 @@ class ProductivityOut(BaseModel):
     best_current_streak: int
 
 class WeeklyOut(BaseModel):
-    week_start: date
-    week_end: date
+    week_start: date_type
+    week_end: date_type
     tasks_created: int
     tasks_completed: int
     habit_logs_completed: int
